@@ -17,5 +17,14 @@ haproxy_distro_packages:
   - haproxy
   - nc # Used for the Ansible haproxy module
 
+haproxy_distro_certbot_packages:
+  - certbot
+  - python3-certbot
+  - python3-pyrfc3339
+  - python3-parsedatetime
+  - python3-josepy
+  - python3-configargparse
+  - python3-acme
+
 # Set system CA store which can be used to verify backends
 haproxy_system_ca: /etc/pki/tls/certs/ca-bundle.crt

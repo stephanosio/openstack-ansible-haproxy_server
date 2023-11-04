@@ -11,6 +11,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Download EPEL GPG keys
+  get_url:
+    url: "{{ haproxy_centos_epel_key }}"
+    dest: /etc/pki/rpm-gpg
+    mode: "0640"
+  register: _get_yum_keys
+  until: _get_yum_keys is success
+  retries: 5
+  delay: 2
+
+- name: Install EPEL GPG keys
+  rpm_key:
+    key: "/etc/pki/rpm-gpg/{{ haproxy_centos_epel_key.split('/')[-1] }}"
+    state: present
+
+- name: Install EPEL repository
+  yum_repository:
+    name: epel-haproxy_hosts
+    baseurl: "{{ haproxy_centos_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
+    description: "Extra Packages for Enterprise Linux {{ ansible_facts['distribution_major_version'] }} - $basearch"
+    gpgcheck: yes
+    gpgkey: "file:///etc/pki/rpm-gpg/{{ haproxy_centos_epel_key.split('/')[-1] }}"
+    enabled: yes
+    state: present
+    includepkgs: "{{ haproxy_distro_certbot_packages }}"
+
 - name: Install certbot from distro package
   package:
     name: "{{ haproxy_distro_certbot_packages }}"
